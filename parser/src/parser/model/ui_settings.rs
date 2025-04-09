@@ -26,7 +26,6 @@ const VERSIONS: [u32; 3] = [5, 6, 7];
 impl Readable for UISettings {
     fn read_from(reader: &mut dyn Parser) -> Result<Self> {
         let version = reader.start_block_with_versions(14, &VERSIONS)?;
-        println!("{}", version);
         let unknown1 = reader.read_byte()?;
         let unknown2 = reader.read_int()?;
         let unknown3 = reader.read_byte()?;
