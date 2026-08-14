@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::util::{ensure_eq, Result};
+use crate::util::{ensure_eq, CustomError, Result};
 
 use super::{
     super::{Parser, Readable},
@@ -38,7 +38,13 @@ impl Readable for CharacterFile {
         ensure_eq(reader.read_int()?, 0x58434447, "start bytes 0")?;
         ensure_eq(reader.read_int()?, 2, "start bytes 1")?;
         let hdr = Header::read_from(reader)?;
-        ensure_eq(reader.read_byte()?, 3, "start bytes 2")?;
+        let start_byte_2 = reader.read_byte()?;
+        if start_byte_2 != 3 && start_byte_2 != 7 {
+            return Err(CustomError::new(format!(
+                "start bytes 2: expected 3 or 7, found {}",
+                start_byte_2
+            )));
+        }
         ensure_eq(reader.next_int()?, 0, "start bytes 3")?;
         ensure_eq(reader.read_int()?, 8, "version")?;
         let id = UID::read_from(reader)?;
